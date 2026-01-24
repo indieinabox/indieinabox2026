@@ -21,23 +21,33 @@ declare(strict_types=1);
  *
  * @return void
  */
-function autoloader($completeNamespace)
+function autoloader(string $completeNamespace): void
 {
+    // remove the tests prefix from the namespace
+    $completeNamespace = str_replace('Tests\\', '', $completeNamespace);
+
+    // remove the indieinabox prefix from the namespace
+    $completeNamespace = str_replace('Indieinabox\\', '', $completeNamespace);
+
     // Convert namespace separators to directory separators
     $file = str_replace('\\', DIRECTORY_SEPARATOR, $completeNamespace);
 
     // Define the base directory for classes
-    $base_dir = __DIR__ . DIRECTORY_SEPARATOR . '_engine' .
+    $baseDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . '_engine' .
         DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR;
 
     // Complete file path
-    $file = $base_dir . $file . '.php';
+    $file = $baseDir . $file . '.php';
 
     // Check if file exists before including it
-    if (!file_exists($file)) {
-        throw new \Exception("File not found: {$file}"); //NOSONAR
+    if (file_exists($file)) {
+        // phpcs:ignore Generic.PHP.ForbiddenFunctions.FoundWithAlternative
+        include_once $file; // NOSONAR
     }
-    include_once $file;
+
+    // else {
+    //     throw new \Exception("File not found: {$file}"); //NOSONAR
+    // }
 }
 
 // Register the autoload function
